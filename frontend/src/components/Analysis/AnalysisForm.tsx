@@ -14,6 +14,7 @@ import {
 } from 'antd'
 import { FolderOpenOutlined, PlayCircleOutlined } from '@ant-design/icons'
 import type { AnalysisRequest, AnalysisOptions } from '@/types/api'
+import FolderBrowserModal from './FolderBrowserModal'
 
 const { Title } = Typography
 
@@ -54,6 +55,7 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({
   const [isFormValid, setIsFormValid] = useState(false)
   const [pathValidationMessage, setPathValidationMessage] = useState('')
   const [hasUserInput, setHasUserInput] = useState(false)
+  const [isBrowserModalVisible, setIsBrowserModalVisible] = useState(false)
 
   // formData가 변경되면 Form과 로컬 state 업데이트
   React.useEffect(() => {
@@ -181,6 +183,28 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({
     return true
   }
 
+  const handleBrowseFolder = () => {
+    setIsBrowserModalVisible(true)
+  }
+
+  const handleFolderSelect = (path: string) => {
+    // 폼 필드 값 설정
+    form.setFieldsValue({ project_path: path })
+    setHasUserInput(true)
+
+    // 폼 값이 업데이트된 후 유효성 검사 실행
+    form.validateFields(['project_path']).then(() => {
+      validateForm()
+    }).catch(() => {
+      validateForm()
+    })
+
+    // 상위 컴포넌트에 알림
+    updateFormData({ project_path: path })
+
+    message.success('폴더가 선택되었습니다')
+  }
+
   const handleAddPattern = () => {
     // 한글 입력 조합 중일 때는 실행하지 않음
     if (isComposing) {
@@ -283,16 +307,26 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({
         <Title level={4}>프로젝트 설정</Title>
 
         <Form.Item
-          name="project_path"
           label="프로젝트 경로"
           validateStatus={hasUserInput && pathValidationMessage ? 'error' : ''}
           help={hasUserInput && pathValidationMessage ? pathValidationMessage : 'Python 프로젝트의 절대 경로를 입력하세요'}
-          rules={[{ required: true, message: '프로젝트 경로를 입력해주세요' }]}
         >
-          <Input
-            placeholder="/path/to/your/python/project"
-            prefix={<FolderOpenOutlined />}
-          />
+          <Space.Compact style={{ width: '100%' }}>
+            <Form.Item
+              name="project_path"
+              noStyle
+              rules={[{ required: true, message: '프로젝트 경로를 입력해주세요' }]}
+            >
+              <Input
+                placeholder="/path/to/your/python/project"
+                prefix={<FolderOpenOutlined />}
+                style={{ flex: 1 }}
+              />
+            </Form.Item>
+            <Button onClick={handleBrowseFolder} icon={<FolderOpenOutlined />}>
+              Browse
+            </Button>
+          </Space.Compact>
         </Form.Item>
 
         <Title level={4} style={{ marginTop: 120, marginBottom: 16 }}>Analysis Options</Title>
@@ -377,6 +411,12 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({
           </Button>
         </Form.Item>
       </Form>
+
+      <FolderBrowserModal
+        visible={isBrowserModalVisible}
+        onCancel={() => setIsBrowserModalVisible(false)}
+        onSelect={handleFolderSelect}
+      />
     </Card>
   )
 }

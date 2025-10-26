@@ -101,6 +101,17 @@ class SearchResponse(BaseModel):
     total_results: int
     results: List[SearchResult]
 
+class DirectoryItem(BaseModel):
+    name: str
+    path: str
+    is_directory: bool
+    has_python_files: bool = False
+
+class BrowseDirectoryResponse(BaseModel):
+    current_path: str
+    parent_path: Optional[str]
+    directories: List[DirectoryItem]
+
 class QualityMetricsResponse(BaseModel):
     entity_id: str
     entity_type: str
@@ -506,6 +517,68 @@ async def root():
 async def health_check():
     """API Health check endpoint"""
     return {"status": "running", "message": "PyView API Server", "version": "1.0.0"}
+
+@app.get("/api/browse-directory", response_model=BrowseDirectoryResponse)
+async def browse_directory(path: str = None):
+    """Browse directories on the local filesystem"""
+    try:
+        # If no path provided, use home directory
+        if not path or path.strip() == "":
+            path = str(Path.home())
+
+        current_path = Path(path).expanduser().resolve()
+
+        # Check if path exists and is a directory
+        if not current_path.exists():
+            raise HTTPException(status_code=404, detail="Path does not exist")
+
+        if not current_path.is_dir():
+            raise HTTPException(status_code=400, detail="Path is not a directory")
+
+        # Get parent directory
+        parent_path = str(current_path.parent) if current_path.parent != current_path else None
+
+        # List directories in current path
+        directories = []
+        try:
+            for item in sorted(current_path.iterdir(), key=lambda x: (not x.is_dir(), x.name.lower())):
+                # Only include directories
+                if item.is_dir():
+                    # Skip hidden directories (starting with .)
+                    if item.name.startswith('.'):
+                        continue
+
+                    # Check if directory has Python files
+                    has_python_files = False
+                    try:
+                        # Quick check: see if there are any .py files in immediate children
+                        has_python_files = any(
+                            child.suffix == '.py'
+                            for child in item.iterdir()
+                            if child.is_file()
+                        )
+                    except (PermissionError, OSError):
+                        pass
+
+                    directories.append(DirectoryItem(
+                        name=item.name,
+                        path=str(item),
+                        is_directory=True,
+                        has_python_files=has_python_files
+                    ))
+        except PermissionError:
+            raise HTTPException(status_code=403, detail="Permission denied to read directory")
+
+        return BrowseDirectoryResponse(
+            current_path=str(current_path),
+            parent_path=parent_path,
+            directories=directories
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error browsing directory: {str(e)}")
 
 @app.post("/api/analyze", response_model=AnalysisResponse)
 async def start_analysis(request: AnalysisRequest):
