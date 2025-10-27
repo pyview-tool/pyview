@@ -1173,22 +1173,25 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
     };
   };
 
+  // 상태로 타겟 레벨 관리
+  const [targetLevel, setTargetLevel] = useState<number | null>(null);
+
   // 레벨 변경 핸들러
   const handleLevelChange = async (newLevel: number) => {
+    setTargetLevel(newLevel); // 타겟 레벨 저장
     setIsLevelChanging(true);
-    message.loading(`${getLevelName(newLevel)} 레벨로 전환 중...`, 0.5);
-    
+
     // Give UI time to show loading state
     await new Promise(resolve => setTimeout(resolve, 100));
-    
+
     setViewLevel(newLevel);
     setExpandedNodes(new Set()); // 레벨 변경 시 확장 상태 초기화
-    
+
     // Additional delay to prevent UI freezing
     await new Promise(resolve => setTimeout(resolve, 200));
-    
+
     setIsLevelChanging(false);
-    message.success(`현재 ${getLevelName(newLevel)} 레벨을 보고 있습니다`);
+    setTargetLevel(null); // 완료 후 초기화
   };
 
   const getLevelName = (level: number): string => {
@@ -1388,7 +1391,7 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
           }}>
             <Spin size="large" />
             <div style={{ marginTop: 16, fontSize: 16, fontWeight: 500 }}>
-{getLevelName(viewLevel)} 레벨 렌더링 중...
+{getLevelName(targetLevel !== null ? targetLevel : viewLevel)} 레벨 렌더링 중...
             </div>
             <div style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
 더 나은 성능을 위해 레이아웃 최적화 중
