@@ -1,6 +1,6 @@
 // 그래프와 컨트롤이 있는 시각화 페이지
 import React, { useState, useEffect } from 'react'
-import { Row, Col, message, Alert } from 'antd'
+import { Row, Col, message, Alert, Spin } from 'antd'
 import { ApiService } from '@/services/api'
 import HierarchicalNetworkGraph from './HierarchicalNetworkGraph'
 import FileTreeSidebar from '../FileTree/FileTreeSidebar'
@@ -205,12 +205,11 @@ const VisualizationPage: React.FC<VisualizationPageProps> = ({ analysisId }) => 
   }
 
   return (
-    <div>
-
+    <div style={{ position: 'relative', minHeight: '100%' }}>
       <Row gutter={[16, 16]}>
-        {/* File Tree Column - 조건부 렌더링 */}
-        {analysisResults && (
-          <Col xs={24} sm={6} md={6} lg={5}>
+        {/* File Tree Column - 항상 렌더링하되, 데이터가 없으면 빈 상태 */}
+        <Col xs={24} sm={6} md={6} lg={5}>
+          {analysisResults ? (
             <FileTreeSidebar
               analysisData={analysisResults}
               cycleData={extractCycleData(analysisResults)}
@@ -218,25 +217,51 @@ const VisualizationPage: React.FC<VisualizationPageProps> = ({ analysisId }) => 
               selectedNodeId={selectedNodeId || undefined}
               style={{ height: 'calc(100vh - 200px)' }}
             />
-          </Col>
-        )}
+          ) : (
+            <div style={{ height: 'calc(100vh - 200px)', border: '1px solid #d9d9d9', borderRadius: '6px', background: '#fafafa' }} />
+          )}
+        </Col>
         
         {/* Graph Column */}
-        <Col xs={24} sm={analysisResults ? 18 : 24} md={analysisResults ? 18 : 24} lg={analysisResults ? 19 : 24}>
+        <Col xs={24} sm={18} md={18} lg={19}>
           {/* 계층형 네트워크 그래프 */}
           <HierarchicalNetworkGraph
             data={graphData || undefined}
-            cycleData={extractCycleData(analysisResults)}
+            cycleData={analysisResults ? extractCycleData(analysisResults) : undefined}
             onNodeClick={handleGraphNodeClick}
             selectedNodeId={selectedNodeId || undefined}
             projectName={analysisResults?.project_info?.name}
-            // 📌 공용 오버레이: GET 대기 또는 그래프 바쁨일 때 ON
-            overlayVisible={isFetching || graphBusy}
-            overlayTitle={isFetching ? '분석된 파일의 정보를 받아오고 있습니다.' : undefined}
+            // 📌 공용 오버레이: 그래프 바쁨일 때만 ON (GET은 VisualizationPage에서 처리)
+            overlayVisible={graphBusy}
             onGraphReady={() => setGraphBusy(false)}
           />
         </Col>
       </Row>
+
+      {/* 🔹 초기 GET 요청 중일 때 표시되는 전역 오버레이 (희미하게) */}
+      {isFetching && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(255, 255, 255, 0.65)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000,
+            animation: 'fadeIn 0.3s ease-in-out',
+          }}
+        >
+          <Spin size="large" style={{ transform: 'scale(1.5)' }} />
+          <div style={{ marginTop: 24, fontSize: 24, fontWeight: 600, color: '#333' }}>
+            분석된 파일의 정보를 받아오고 있습니다.
+          </div>
+        </div>
+      )}
     </div>
   )
 }
