@@ -47,6 +47,10 @@ interface HierarchicalGraphProps {
   onNodeClick?: (nodeId: string) => void;
   selectedNodeId?: string | null;
   projectName?: string; // 프로젝트 이름
+  overlayVisible?: boolean;  // 외부(페이지)에서 강제 오버레이 ON
+  overlayTitle?: string;     // 표시 문구
+  overlaySubTitle?: string;  // 보조 문구(선택)
+  onGraphReady?: () => void;  // 그래프 준비 완료 콜백
 }
 
 const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({ 
@@ -54,7 +58,11 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
   cycleData,
   onNodeClick,
   selectedNodeId,
-  projectName = 'Root' // 기본값 설정
+  projectName = 'Root', // 기본값 설정
+  overlayVisible = false,
+  overlayTitle,
+  overlaySubTitle,
+  onGraphReady
 }) => {
   const cyRef = useRef<HTMLDivElement>(null);
   const cyInstanceRef = useRef<cytoscape.Core | null>(null);
@@ -294,6 +302,8 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
         setTimeout(() => {
           cy.fit();
           cy.zoom(cy.zoom() * 0.8);
+          // 그래프 준비 완료 콜백 호출
+          onGraphReady?.();
         }, 1000);
       });
 
@@ -310,7 +320,7 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
         cyInstanceRef.current = null;
       }
     };
-  }, [hierarchicalData, viewLevel, expandedNodes]);
+  }, [hierarchicalData, viewLevel, expandedNodes, onGraphReady]);
 
   // Handle external node selection (from file tree)
   useEffect(() => {
@@ -1199,6 +1209,9 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
     return names[level] || 'Unknown';
   };
 
+  // 공용 오버레이 표시 여부 (레벨 변경 또는 외부 오버레이)
+  const showOverlay = isLevelChanging || overlayVisible;
+
   // 전체 확장/축소
   const expandAll = () => {
     const allExpandableNodes = hierarchicalData.nodes
@@ -1373,8 +1386,8 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
           }} 
         />
         
-        {/* Level Changing Loading Overlay */}
-        {isLevelChanging && (
+        {/* 공용 Loading Overlay */}
+        {showOverlay && (
           <div style={{
             position: 'absolute',
             top: 0,
@@ -1391,10 +1404,11 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
           }}>
             <Spin size="large" />
             <div style={{ marginTop: 16, fontSize: 16, fontWeight: 500 }}>
-{getLevelName(targetLevel !== null ? targetLevel : viewLevel)} 레벨 렌더링 중...
+              {/* 레벨 변경 시: 기존 메시지, 외부 오버레이 시: overlayTitle 우선 */}
+              {overlayTitle ?? (isLevelChanging ? `${getLevelName(targetLevel !== null ? targetLevel : viewLevel)} 레벨 렌더링 중...` : '그래프 렌더링 중...')}
             </div>
             <div style={{ marginTop: 8, fontSize: 12, color: '#666' }}>
-더 나은 성능을 위해 레이아웃 최적화 중
+              {overlaySubTitle ?? '더 나은 성능을 위해 레이아웃 최적화 중'}
             </div>
           </div>
         )}

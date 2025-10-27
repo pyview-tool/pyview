@@ -1,6 +1,6 @@
 // 그래프와 컨트롤이 있는 시각화 페이지
 import React, { useState, useEffect } from 'react'
-import { Row, Col, message, Alert, Spin, Progress } from 'antd'
+import { Row, Col, message, Alert } from 'antd'
 import { ApiService } from '@/services/api'
 import HierarchicalNetworkGraph from './HierarchicalNetworkGraph'
 import FileTreeSidebar from '../FileTree/FileTreeSidebar'
@@ -29,16 +29,9 @@ interface GraphData {
 
 const VisualizationPage: React.FC<VisualizationPageProps> = ({ analysisId }) => {
   const [graphData, setGraphData] = useState<GraphData | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [isFetching, setIsFetching] = useState(false)  // GET 대기 상태
+  const [graphBusy, setGraphBusy] = useState(false)    // 그래프 변환/렌더 상태
   const [error, setError] = useState<string | null>(null)
-  const [loadingStage, setLoadingStage] = useState<string>('')
-  const [loadingProgress, setLoadingProgress] = useState<number>(0)
-  const [loadingDetails, setLoadingDetails] = useState<string>('')
-  const [processingStats, setProcessingStats] = useState<{
-    totalItems: number
-    processedItems: number
-    currentType: string
-  }>({ totalItems: 0, processedItems: 0, currentType: '' })
   
   // Graph control states - only hierarchical mode
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
@@ -65,69 +58,35 @@ const VisualizationPage: React.FC<VisualizationPageProps> = ({ analysisId }) => 
 
     const loadAnalysisData = async () => {
       try {
-        if (isMounted) {
-          setLoading(true)
-          setError(null)
-          setLoadingStage('분석 결과를 가져오고 있습니다...')
-          setLoadingProgress(5)
-        }
+        // ① GET 요청 대기 오버레이 ON
+        setIsFetching(true)
+        setError(null)
 
         const results = await ApiService.getAnalysisResults(analysisId)
 
         if (!isMounted || abortController.signal.aborted) return;
 
-        // Log cycle data for debugging
-        console.log('🔍 Analysis results received:', results)
-        console.log('🔄 Cycle data in results:', results?.cycles)
-
         // Store raw analysis results for file tree
         setAnalysisResults(results)
-        setLoadingProgress(10)
+        
+        // ② GET 요청 대기 오버레이 OFF
+        setIsFetching(false)
 
-        // Transform backend data to graph format with progress
-        setLoadingStage('그래프 데이터를 처리하고 있습니다...')
-        setLoadingProgress(15)
-
+        // ③ 그래프 변환/렌더 구간은 "그래프 오버레이"로 통합
+        setGraphBusy(true)
+        
         // Use setTimeout to allow UI to update before heavy computation
         await new Promise(resolve => setTimeout(resolve, 100))
 
         if (!isMounted || abortController.signal.aborted) return;
 
-        const transformedData = await transformAnalysisToGraph(results, (progress: number, stage: string, details?: string, stats?: { totalItems: number, processedItems: number, currentType: string }) => {
-          if (isMounted) {
-            setLoadingProgress(15 + progress * 80) // 15% ~ 95%
-            setLoadingStage(stage)
-            if (details) setLoadingDetails(details)
-            if (stats) setProcessingStats(stats)
-          }
-        })
+        // Transform data (변환만 수행, onGraphReady에서 최종 OFF)
+        const transformedData = await transformAnalysisToGraph(results)
         
         if (!isMounted || abortController.signal.aborted) return;
 
-        // Start final rendering phase
-        setLoadingProgress(95)
-        setLoadingStage('그래프 시각화를 렌더링하고 있습니다...')
-        setLoadingDetails('시각적 요소와 레이아웃을 준비하고 있습니다...')
-        setProcessingStats({ totalItems: 0, processedItems: 0, currentType: '' })
-
         setGraphData(transformedData)
-
-        // Simulate graph rendering time for better UX
-        await new Promise(resolve => setTimeout(resolve, 500))
-
-        if (!isMounted || abortController.signal.aborted) return;
-
-        setLoadingProgress(100)
-        setLoadingStage('시각화 준비 완료!')
-        setLoadingDetails('그래프가 성공적으로 렌더링되었습니다')
-
-        // Clear loading states after a brief display
-        setTimeout(() => {
-          if (isMounted) {
-            setLoadingDetails('')
-            setProcessingStats({ totalItems: 0, processedItems: 0, currentType: '' })
-          }
-        }, 1000)
+        // graphBusy는 onGraphReady에서 끔
         
       } catch (err) {
         if (isMounted && !abortController.signal.aborted) {
@@ -135,12 +94,8 @@ const VisualizationPage: React.FC<VisualizationPageProps> = ({ analysisId }) => 
           setError(errorMessage)
           message.error(errorMessage)
         }
-      } finally {
-        if (isMounted) {
-          setLoading(false)
-          setLoadingStage('')
-          setLoadingProgress(0)
-        }
+        setIsFetching(false)
+        setGraphBusy(false)
       }
     }
 
@@ -225,94 +180,6 @@ const VisualizationPage: React.FC<VisualizationPageProps> = ({ analysisId }) => 
     handleNodeSelection(nodeId, 'graph')
   }
 
-  if (loading) {
-    return (
-      <div style={{ textAlign: 'center', padding: '50px 0' }}>
-        <Spin size="large" />
-
-        {/* Main Loading Stage */}
-        <div style={{ marginTop: 16, fontSize: 18, fontWeight: 600, color: '#1890ff' }}>
-          {loadingStage || '시각화 데이터 로드 중...'}
-        </div>
-
-        {/* Progress Bar */}
-        {loadingProgress > 0 && (
-          <div style={{ maxWidth: 500, margin: '20px auto 0' }}>
-            <Progress
-              percent={Math.round(loadingProgress)}
-              status="active"
-              strokeColor={{
-                '0%': '#108ee9',
-                '100%': '#87d068',
-              }}
-              format={(percent) => `${percent}%`}
-            />
-          </div>
-        )}
-
-        {/* Detailed Progress Info */}
-        {loadingDetails && (
-          <div style={{
-            marginTop: 12,
-            fontSize: 14,
-            color: '#595959',
-            fontWeight: 500
-          }}>
-            {loadingDetails}
-          </div>
-        )}
-
-        {/* Processing Stats */}
-        {processingStats.totalItems > 0 && (
-          <div style={{
-            marginTop: 8,
-            fontSize: 12,
-            color: '#8c8c8c',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 16
-          }}>
-            <span>
-              📊 {processingStats.currentType}: {processingStats.processedItems.toLocaleString()} / {processingStats.totalItems.toLocaleString()}
-            </span>
-            {processingStats.currentType && (
-              <span>
-                ⚡ {Math.round((processingStats.processedItems / processingStats.totalItems) * 100)}% complete
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Processing Steps Indicator */}
-        <div style={{
-          marginTop: 24,
-          maxWidth: 400,
-          margin: '24px auto 0',
-          textAlign: 'left'
-        }}>
-          <div style={{ fontSize: 12, color: '#8c8c8c', marginBottom: 8 }}>
-            📋 처리 단계:
-          </div>
-          <div style={{ fontSize: 11, color: '#bfbfbf', lineHeight: 1.6 }}>
-            {loadingProgress < 10 && '🔄 분석 데이터 가져오는 중...'}
-            {loadingProgress >= 10 && loadingProgress < 20 && '✅ 분석 데이터 로드 완료'}
-            {loadingProgress >= 20 && loadingProgress < 40 && '🔄 패키지 및 모듈 처리 중...'}
-            {loadingProgress >= 40 && loadingProgress < 60 && '🔄 클래스 계층 구성 중...'}
-            {loadingProgress >= 60 && loadingProgress < 80 && '🔄 메서드 및 필드 처리 중...'}
-            {loadingProgress >= 80 && loadingProgress < 95 && '🔄 관계 구성 중...'}
-            {loadingProgress >= 95 && loadingProgress < 100 && '🔄 그래프 시각화 렌더링 중...'}
-            {loadingProgress >= 100 && '✅ 시각화 준비 완료!'}
-          </div>
-        </div>
-
-        <div style={{ marginTop: 20, color: '#666', fontSize: 12 }}>
-          💡 대용량 코드베이스는 처리 시간이 더 오래 걸릴 수 있습니다. 더 나은 성능을 위해 시각화를 최적화하는 동안 잠시 기다려 주세요.
-        </div>
-      </div>
-    )
-  }
-
   if (error) {
     return (
       <Alert
@@ -363,6 +230,10 @@ const VisualizationPage: React.FC<VisualizationPageProps> = ({ analysisId }) => 
             onNodeClick={handleGraphNodeClick}
             selectedNodeId={selectedNodeId || undefined}
             projectName={analysisResults?.project_info?.name}
+            // 📌 공용 오버레이: GET 대기 또는 그래프 바쁨일 때 ON
+            overlayVisible={isFetching || graphBusy}
+            overlayTitle={isFetching ? '분석된 파일의 정보를 받아오고 있습니다.' : undefined}
+            onGraphReady={() => setGraphBusy(false)}
           />
         </Col>
       </Row>
