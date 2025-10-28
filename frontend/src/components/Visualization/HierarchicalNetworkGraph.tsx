@@ -942,23 +942,21 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
   // 계층적 레이아웃 - Cose-Bilkent만 사용
   const getHierarchicalLayout = () => {
     return {
-      name: 'cose-bilkent',
-      quality: 'default',
-      nodeDimensionsIncludeLabels: true,
-      refresh: 20,
-      fit: true,
-      padding: 30,
-      randomize: false,
-      nodeRepulsion: 6000,
-      idealEdgeLength: 70,
-      edgeElasticity: 0.45,
-      nestingFactor: 0.2,
-      gravity: 0.25,
-      numIter: 2500,
-      tile: true,
-      tilingPaddingVertical: 40,
-      tilingPaddingHorizontal: 40,
-      animate: false
+      name: 'cose-bilkent',                  // 레이아웃 알고리즘 이름
+      nodeDimensionsIncludeLabels: true,     // 노드 크기 산정 시 라벨 포함
+      fit: true,                             // 그래프 fit
+      padding: 30,                           // 경계 패딩
+      randomize: false,                      // 시드(nil), 고정 배치
+      nodeRepulsion: 10000000,                   // 노드 반발력
+      idealEdgeLength: 70,                   // 이상적 엣지 길이
+      edgeElasticity: 0.45,                  // 엣지 신축성
+      nestingFactor: 0.2,                    // 컨테이너 포함력
+      gravity: 0.25,                         // 중력
+      numIter: 2500,                         // 최대 반복 횟수
+      tile: true,                            // 타일링(격자) 허용
+      tilingPaddingVertical: 40,             // 타일 패딩(세로)
+      tilingPaddingHorizontal: 40,           // 타일 패딩(가로)
+      animate: true                         // 애니메이션 비활성화
     };
   };
 

@@ -45,6 +45,7 @@ export const getHierarchicalStylesheet = (): any[] => [
         const level = node.data('level') || 1;
         return Math.max(30, 80 - level * 8);
       },
+      'padding': '100%',
       'text-valign': 'center',
       'text-halign': 'center',
       'color': '#000',
@@ -125,6 +126,7 @@ export const getHierarchicalStylesheet = (): any[] => [
   {
     selector: '.package-container',
     style: {
+      'padding': '10%',
       'shape': 'round-rectangle',
       'background-color': '#B0FFB0',
       'background-opacity': 0.05,
@@ -161,6 +163,7 @@ export const getHierarchicalStylesheet = (): any[] => [
   {
     selector: '.module-container',
     style: {
+      'padding': '10%',
       'shape': 'round-rectangle',
       'background-color': '#00FF55',
       'background-opacity': 0.08,
@@ -168,7 +171,6 @@ export const getHierarchicalStylesheet = (): any[] => [
       'border-color': '#52c41a',
       'label': '',
       'text-opacity': 0,
-      'padding': '20px',
       'z-index': 1,
       'overlay-opacity': 0,
       'events': 'no'
@@ -179,6 +181,7 @@ export const getHierarchicalStylesheet = (): any[] => [
   {
     selector: '.class-container',
     style: {
+      'padding': '10%',
       'shape': 'round-rectangle',
       'background-color': '#E5FF00',
       'background-opacity': 0.05,
@@ -186,7 +189,6 @@ export const getHierarchicalStylesheet = (): any[] => [
       'border-color': '#d4b106',
       'label': '',
       'text-opacity': 0,
-      'padding': '20px',
       'z-index': 2,
       'overlay-opacity': 0,
       'events': 'no'
