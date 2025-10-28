@@ -23,6 +23,11 @@ const loadCytoscapeExtensions = async () => {
   }
 };
 
+// === Layout scaling utils ===
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+// 서브선형(√n) 스케일: 대형 그래프에서도 안정적인 간격 증가
+const repulsionSqrt = (n: number) => 12_000 + 4_000 * Math.sqrt(Math.max(1, n));
+
 
 
 interface HierarchicalNode {
@@ -287,7 +292,8 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
         container: cyRef.current,
         elements,
         style: getHierarchicalStylesheet(),
-        layout: getHierarchicalLayout(),
+        // 초기에는 preset으로 두고, ready 시 동적 레이아웃을 1회 실행
+        layout: { name: 'preset' },
         wheelSensitivity: 1,
         minZoom: 0.1,
         maxZoom: 5
@@ -300,7 +306,9 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
 
       // 레이아웃 완료 후 자동 맞춤
       cy.ready(() => {
-        cy.layout(getHierarchicalLayout()).run();
+        // 모듈 수 집계 후 스케일링된 레이아웃 실행
+        const moduleCount = cy.nodes('[type = "module"]').length;
+        cy.layout(getHierarchicalLayout(moduleCount)).run();
         setTimeout(() => {
           cy.fit();
           cy.zoom(cy.zoom() * 0.8);
@@ -939,25 +947,29 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
 
   // 계층적 스타일시트는 별도 파일로 분리됨
 
-  // 계층적 레이아웃 - Cose-Bilkent만 사용
-  const getHierarchicalLayout = () => {
+  // 계층적 레이아웃 - 모듈 수에 따라 동적 파라미터 적용
+  const getHierarchicalLayout = (moduleCount: number) => {
+    const nodeRepulsion = clamp(repulsionSqrt(moduleCount), 8_000, 2_000_000);
+    const idealEdgeLength = 100 + Math.min(200, moduleCount * 2);
+    const tilingPad = 60 + Math.min(120, moduleCount);
+
     return {
-      name: 'cose-bilkent',                  // 레이아웃 알고리즘 이름
-      nodeDimensionsIncludeLabels: true,     // 노드 크기 산정 시 라벨 포함
-      fit: true,                             // 그래프 fit
-      padding: 30,                           // 경계 패딩
-      randomize: false,                      // 시드(nil), 고정 배치
-      nodeRepulsion: 10000000,                   // 노드 반발력
-      idealEdgeLength: 70,                   // 이상적 엣지 길이
-      edgeElasticity: 0.45,                  // 엣지 신축성
-      nestingFactor: 0.2,                    // 컨테이너 포함력
-      gravity: 0.25,                         // 중력
-      numIter: 2500,                         // 최대 반복 횟수
-      tile: true,                            // 타일링(격자) 허용
-      tilingPaddingVertical: 40,             // 타일 패딩(세로)
-      tilingPaddingHorizontal: 40,           // 타일 패딩(가로)
-      animate: true                         // 애니메이션 비활성화
-    };
+      name: 'cose-bilkent',
+      nodeDimensionsIncludeLabels: true,
+      fit: true,
+      padding: 30,
+      randomize: false,
+      nodeRepulsion,
+      idealEdgeLength,
+      edgeElasticity: 0.2,
+      nestingFactor: 0.1,
+      gravity: 0.08,
+      numIter: 3000,
+      tile: true,
+      tilingPaddingVertical: tilingPad,
+      tilingPaddingHorizontal: tilingPad,
+      animate: false
+    } as any;
   };
 
   // 상태로 타겟 레벨 관리
