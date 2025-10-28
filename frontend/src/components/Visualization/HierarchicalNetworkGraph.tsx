@@ -309,12 +309,10 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
         // 모듈 수 집계 후 스케일링된 레이아웃 실행
         const moduleCount = cy.nodes('[type = "module"]').length;
         cy.layout(getHierarchicalLayout(moduleCount)).run();
-        setTimeout(() => {
-          cy.fit();
-          cy.zoom(cy.zoom() * 0.8);
-          // 그래프 준비 완료 콜백 호출
-          onGraphReady?.();
-        }, 1000);
+        // 레이아웃 직후 바로 화면 맞춤 및 콜백 호출 (불필요한 2차 렌더링 감축)
+        cy.fit();
+        cy.zoom(cy.zoom() * 0.8);
+        onGraphReady?.();
       });
 
       } catch (error) {
