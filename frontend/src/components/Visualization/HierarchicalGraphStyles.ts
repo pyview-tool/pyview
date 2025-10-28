@@ -126,7 +126,7 @@ export const getHierarchicalStylesheet = (): any[] => [
   {
     selector: '.package-container',
     style: {
-      'padding': '10%',
+      'padding': '5%',
       'shape': 'round-rectangle',
       'background-color': '#B0FFB0',
       'background-opacity': 0.05,
@@ -163,7 +163,7 @@ export const getHierarchicalStylesheet = (): any[] => [
   {
     selector: '.module-container',
     style: {
-      'padding': '10%',
+      'padding': '5%',
       'shape': 'round-rectangle',
       'background-color': '#00FF55',
       'background-opacity': 0.08,

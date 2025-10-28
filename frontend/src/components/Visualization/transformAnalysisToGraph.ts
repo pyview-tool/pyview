@@ -20,6 +20,20 @@ export const transformAnalysisToGraph = async (
   analysisResults: any,
   onProgress?: (progress: number, stage: string, details?: string, stats?: { totalItems: number, processedItems: number, currentType: string }) => void
 ): Promise<GraphData> => {
+  // 사람이 읽기 쉬운 표시용 이름 생성기
+  const normalizeName = (raw: string | undefined | null, fallback: string): string => {
+    const source = (raw ?? '').toString();
+    if (!source) return fallback;
+    // 경로 구분자 통일
+    const unified = source.replace(/\\/g, '/');
+    // 가장 우선: 파일/경로 기준 분리
+    const bySlash = unified.includes('/') ? unified.substring(unified.lastIndexOf('/') + 1) : unified;
+    // 콜론 접두 체계(mod:, cls:, meth: 등) 제거
+    const byColon = bySlash.includes(':') ? bySlash.substring(bySlash.lastIndexOf(':') + 1) : bySlash;
+    // 점(.)으로 구분되는 모듈 경로의 마지막 토큰 사용
+    const byDot = byColon.includes('.') ? byColon.substring(byColon.lastIndexOf('.') + 1) : byColon;
+    return byDot || fallback;
+  };
   const nodes: GraphData['nodes'] = []
   const edges: GraphData['edges'] = []
 
@@ -57,7 +71,7 @@ export const transformAnalysisToGraph = async (
         const nodeId = pkg.id || pkg.name || `pkg_${index}`
         nodes.push({
           id: nodeId,
-          name: pkg.name || `Package ${index}`,
+          name: normalizeName(pkg.name, `Package ${index}`),
           type: 'package',
           x: Math.cos(index * 0.8) * 60,
           y: 20,
@@ -102,7 +116,7 @@ export const transformAnalysisToGraph = async (
         const nodeId = mod.id || mod.name || `mod_${index}`
         nodes.push({
           id: nodeId,
-          name: mod.name || `Module ${index}`,
+          name: normalizeName(mod.name, `Module ${index}`),
           type: 'module',
           x: Math.cos(angle) * radius,
           y: 0,
@@ -146,7 +160,7 @@ export const transformAnalysisToGraph = async (
         const height = 15 + (index % 3) * 8
         nodes.push({
           id: cls.id || cls.name || `cls_${index}`,
-          name: cls.name || `Class ${index}`,
+          name: normalizeName(cls.name, `Class ${index}`),
           type: 'class',
           x: Math.cos(angle) * radius,
           y: height,
@@ -187,7 +201,7 @@ export const transformAnalysisToGraph = async (
       const height = 30 + (index % 3) * 12
       nodes.push({
         id: method.id || method.name || `method_${index}`,
-        name: method.name || `Method ${index}`,
+        name: normalizeName(method.name, `Method ${index}`),
         type: 'method',
         x: Math.cos(angle) * radius,
         y: height,
@@ -222,7 +236,7 @@ export const transformAnalysisToGraph = async (
       const height = -20 + (index % 2) * 10
       nodes.push({
         id: field.id || field.name || `field_${index}`,
-        name: field.name || `Field ${index}`,
+        name: normalizeName(field.name, `Field ${index}`),
         type: 'field',
         x: Math.cos(angle) * radius,
         y: height,

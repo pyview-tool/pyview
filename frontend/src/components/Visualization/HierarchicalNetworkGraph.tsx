@@ -947,26 +947,27 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
 
   // 계층적 레이아웃 - 모듈 수에 따라 동적 파라미터 적용
   const getHierarchicalLayout = (moduleCount: number) => {
-    const nodeRepulsion = clamp(repulsionSqrt(moduleCount), 8_000, 2_000_000);
+    const nodeRepulsion = 12000 + 10000 * Math.sqrt(moduleCount);
     const idealEdgeLength = 100 + Math.min(200, moduleCount * 2);
-    const tilingPad = 60 + Math.min(120, moduleCount);
+    // const tilingPad = 60 + Math.min(120, moduleCount);
 
+    // 동적 레이아웃 파라미터 적용 (cose-bilkent)
     return {
-      name: 'cose-bilkent',
-      nodeDimensionsIncludeLabels: true,
-      fit: true,
-      padding: 30,
-      randomize: false,
-      nodeRepulsion,
-      idealEdgeLength,
-      edgeElasticity: 0.2,
-      nestingFactor: 0.1,
-      gravity: 0.08,
-      numIter: 3000,
-      tile: true,
-      tilingPaddingVertical: tilingPad,
-      tilingPaddingHorizontal: tilingPad,
-      animate: false
+      name: 'cose-bilkent', // 레이아웃 이름
+      nodeDimensionsIncludeLabels: true, // 노드 크기 계산시 라벨 포함
+      fit: true, // 전체 그래프가 뷰에 맞도록
+      padding: 30, // 전체 패딩
+      randomize: false, // 초기값 랜덤 배치 비활성화
+      nodeRepulsion, // 노드 간 반발력 (동적)
+      idealEdgeLength, // 엣지 길이 (동적)
+      edgeElasticity: 0.2, // 엣지 탄성 정도
+      nestingFactor: 0.1, // 컨테이너 내부의 팽창력
+      gravity: 0.1, // 전체 그래프 중심으로 끌어당김
+      numIter: 3000, // 반복 횟수(충분히 크게)
+      tile: true, // child 노드 타일링 (containing 노드 안에 배치)
+      // tilingPaddingVertical: tilingPad, // 타일링(격자형 배치) 세로 간격 (동적)
+      // tilingPaddingHorizontal: tilingPad, // 타일링 가로 간격 (동적)
+      animate: false // 애니메이션 비활성화 (퍼포먼스)
     } as any;
   };
 
