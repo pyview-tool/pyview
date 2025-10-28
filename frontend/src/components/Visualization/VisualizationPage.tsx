@@ -1,5 +1,5 @@
 // 그래프와 컨트롤이 있는 시각화 페이지
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Row, Col, message, Alert, Spin } from 'antd'
 import { ApiService } from '@/services/api'
 import HierarchicalNetworkGraph from './HierarchicalNetworkGraph'
@@ -31,6 +31,10 @@ const VisualizationPage: React.FC<VisualizationPageProps> = ({ analysisId }) => 
   const [graphData, setGraphData] = useState<GraphData | null>(null)
   const [isFetching, setIsFetching] = useState(false)  // GET 대기 상태
   const [graphBusy, setGraphBusy] = useState(false)    // 그래프 변환/렌더 상태
+  // 그래프 준비 완료 콜백은 stable reference로 메모이즈
+  const handleGraphReady = useCallback(() => {
+    setGraphBusy(false)
+  }, [])
   const [error, setError] = useState<string | null>(null)
   
   // Graph control states - only hierarchical mode
@@ -233,7 +237,7 @@ const VisualizationPage: React.FC<VisualizationPageProps> = ({ analysisId }) => 
             projectName={analysisResults?.project_info?.name}
             // 📌 공용 오버레이: 그래프 바쁨일 때만 ON (GET은 VisualizationPage에서 처리)
             overlayVisible={graphBusy}
-            onGraphReady={() => setGraphBusy(false)}
+            onGraphReady={handleGraphReady}
           />
         </Col>
       </Row>

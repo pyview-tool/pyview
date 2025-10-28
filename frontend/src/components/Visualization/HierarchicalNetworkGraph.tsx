@@ -67,6 +67,7 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
 }) => {
   const cyRef = useRef<HTMLDivElement>(null);
   const cyInstanceRef = useRef<cytoscape.Core | null>(null);
+  const internalSelectionRef = useRef<boolean>(false);
   
   // 상태 관리
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
@@ -321,7 +322,7 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
         cyInstanceRef.current = null;
       }
     };
-  }, [hierarchicalData, viewLevel, expandedNodes, onGraphReady]);
+  }, [hierarchicalData, viewLevel, expandedNodes]);
 
   // Handle external node selection (from file tree)
   useEffect(() => {
@@ -343,13 +344,19 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
       // Use the same highlighting logic as clicking on the graph
       handleHierarchicalHighlight(cy, selectedNodeId);
 
-      // Center the view on the node
-      cy.animate({
-        center: { eles: targetNode },
-        zoom: 1.5
-      }, {
-        duration: 500
-      });
+      // 내부 클릭으로 이미 애니메이션을 실행했으면 스킵
+      if (!internalSelectionRef.current) {
+        cy.animate({
+          center: { eles: targetNode },
+          zoom: 1.5
+        }, {
+          duration: 500
+        });
+      }
+
+      if (internalSelectionRef.current) {
+        requestAnimationFrame(() => { internalSelectionRef.current = false; });
+      }
 
     } else {
       // Try to find node by partial match
@@ -369,12 +376,18 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
         // Use the same highlighting logic as clicking on the graph
         handleHierarchicalHighlight(cy, firstMatch.id());
 
-        cy.animate({
-          center: { eles: firstMatch },
-          zoom: 1.5
-        }, {
-          duration: 500
-        });
+        if (!internalSelectionRef.current) {
+          cy.animate({
+            center: { eles: firstMatch },
+            zoom: 1.5
+          }, {
+            duration: 500
+          });
+        }
+
+        if (internalSelectionRef.current) {
+          requestAnimationFrame(() => { internalSelectionRef.current = false; });
+        }
       } else {
         // Keep the selectedNode as is to still show the panel even if not found in graph
       }
@@ -839,6 +852,9 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
       const nodeData = node.data();
       const nodeId = nodeData.id;
 
+      // 내부(그래프) 상호작용으로 선택되었음을 표시하여 외부 useEffect 중복 애니메이션 방지
+      internalSelectionRef.current = true;
+
       setSelectedNode(nodeId);
       
       // 하이라이트 모드
@@ -846,6 +862,18 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
         handleHierarchicalHighlight(cy, nodeId);
       }
       
+      // 클릭한 노드로 포커스 및 부드러운 확대
+      try {
+        const currentZoom = cy.zoom();
+        const targetZoom = Math.max(currentZoom, 1.3);
+        cy.animate({
+          center: { eles: node },
+          zoom: targetZoom
+        }, { duration: 400 });
+      } catch (e) {
+        // ignore animation errors
+      }
+
       // 자식이 있는 노드는 확장/축소
       if (hierarchicalData.hierarchy[nodeId]) {
         toggleNodeExpansion(nodeId);
