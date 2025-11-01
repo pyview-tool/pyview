@@ -291,11 +291,11 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
       const cy = cytoscape({
         container: cyRef.current,
         elements,
-        style: getHierarchicalStylesheet(),
+        style: getHierarchicalStylesheet(viewLevel), // viewLevel 전달
         // 초기에는 preset으로 두고, ready 시 동적 레이아웃을 1회 실행
         layout: { name: 'preset' },
         wheelSensitivity: 1,
-        minZoom: 0.1,
+        minZoom: 0.01,
         maxZoom: 5
       });
 
@@ -306,9 +306,9 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
 
       // 레이아웃 완료 후 자동 맞춤
       cy.ready(() => {
-        // 모듈 수 집계 후 스케일링된 레이아웃 실행
+        // 모듈 수 집계 후 스케일링된 레이아웃 실행 (viewLevel 포함)
         const moduleCount = cy.nodes('[type = "module"]').length;
-        cy.layout(getHierarchicalLayout(moduleCount)).run();
+        cy.layout(getHierarchicalLayout(moduleCount, viewLevel)).run();
         // 레이아웃 직후 바로 화면 맞춤 및 콜백 호출 (불필요한 2차 렌더링 감축)
         cy.fit();
         cy.zoom(cy.zoom() * 0.8);
@@ -945,28 +945,66 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
 
   // 계층적 스타일시트는 별도 파일로 분리됨
 
-  // 계층적 레이아웃 - 모듈 수에 따라 동적 파라미터 적용
-  const getHierarchicalLayout = (moduleCount: number) => {
-    const nodeRepulsion = 12000 + 10000 * Math.sqrt(moduleCount);
-    const idealEdgeLength = 100 + Math.min(200, moduleCount * 2);
-    // const tilingPad = 60 + Math.min(120, moduleCount);
+  // 계층적 레이아웃 - 레벨별로 다른 파라미터 적용
+  const getHierarchicalLayout = (_moduleCount: number, level: number) => {
+    // 레벨별 기본 파라미터 설정
+    const levelConfigs = {
+      0: { // Package 레벨 - 넓은 간격, 큰 반발력
+        nodeRepulsion: 500000,
+        idealEdgeLength: 200,
+        nestingFactor: 0.05,
+        gravity: 0,
+        padding: 50,
+        edgeElasticity: 0.15,
+      },
+      1: { // Module 레벨 - 중간 간격
+        nodeRepulsion: 30000,
+        idealEdgeLength: 150,
+        gravity: 0,
+        padding: 40,
+        edgeElasticity: 0.2,
+      },
+      2: { // Class 레벨 - 조금 더 조밀하게
+        nodeRepulsion: 50000,
+        idealEdgeLength: 120,
+        gravity: 0,
+        padding: 35,
+        edgeElasticity: 0.25,
+      },
+      3: { // Method 레벨 - 조밀하게
+        nodeRepulsion: 200000,
+        nestingFactor: 0.12,
+        gravity: 0,
+        padding: 30,
+        edgeElasticity: 0.4,
+      },
+      4: { // Field 레벨 - 매우 조밀하게
+        nodeRepulsion: 800000,
+        idealEdgeLength: 250,
+        gravity: 0.05,
+        nestingFactor: 0.12,
+        padding: 25,
+        edgeElasticity: 0.35,
+      },
+    };
+
+    // 현재 레벨에 해당하는 설정 가져오기 (기본값: level 1)
+    const config = levelConfigs[level as keyof typeof levelConfigs] || levelConfigs[1];
 
     // 동적 레이아웃 파라미터 적용 (cose-bilkent)
     return {
       name: 'cose-bilkent', // 레이아웃 이름
       nodeDimensionsIncludeLabels: true, // 노드 크기 계산시 라벨 포함
       fit: true, // 전체 그래프가 뷰에 맞도록
-      padding: 30, // 전체 패딩
+      padding: config.padding,
       randomize: false, // 초기값 랜덤 배치 비활성화
-      nodeRepulsion, // 노드 간 반발력 (동적)
-      idealEdgeLength, // 엣지 길이 (동적)
-      edgeElasticity: 0.2, // 엣지 탄성 정도
-      nestingFactor: 0.1, // 컨테이너 내부의 팽창력
-      gravity: 0.1, // 전체 그래프 중심으로 끌어당김
+      nodeRepulsion: config.nodeRepulsion, // 노드 간 반발력 (레벨별)
+      idealEdgeLength: config.idealEdgeLength, // 엣지 길이 (레벨별)
+      edgeElasticity: config.edgeElasticity, // 엣지 탄성 정도 (레벨별)
+      nestingFactor: config.nestingFactor, // 컨테이너 내부의 팽창력 (레벨별)
+      gravity: config.gravity, // 전체 그래프 중심으로 끌어당김
       numIter: 3000, // 반복 횟수(충분히 크게)
       tile: true, // child 노드 타일링 (containing 노드 안에 배치)
-      // tilingPaddingVertical: tilingPad, // 타일링(격자형 배치) 세로 간격 (동적)
-      // tilingPaddingHorizontal: tilingPad, // 타일링 가로 간격 (동적)
       animate: false // 애니메이션 비활성화 (퍼포먼스)
     } as any;
   };

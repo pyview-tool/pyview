@@ -1,6 +1,6 @@
 // Cytoscape 그래프 스타일시트 정의
 
-export const getHierarchicalStylesheet = (): any[] => [
+export const getHierarchicalStylesheet = (viewLevel: number = 1): any[] => [
   // 클래스 노드 전용 스타일 (컨테이너보다 위에 표시)
   {
     selector: 'node[type = "class"]',
@@ -149,9 +149,30 @@ export const getHierarchicalStylesheet = (): any[] => [
       'text-opacity': 1,
       'text-halign': 'left',
       'text-valign': 'top',
-      'text-margin-x': 140,
+      'text-margin-x': (() => {
+        // viewLevel에 따른 텍스트 가로 마진 설정
+        const marginXMap: Record<number, number> = {
+          0: 300,  // Package 레벨 - 가장 큰 마진
+          1: 250,  // Module 레벨
+          2: 550,  // Class 레벨
+          3: 1600,  // Method 레벨
+          4: 2500   // Field 레벨 - 가장 작은 마진
+        };
+        return marginXMap[viewLevel] || 250;
+      })(),
       'text-margin-y': -10,
-      'text-font-size': '100px',
+      'font-size': (() => {
+        // viewLevel에 따른 폰트 크기 설정
+        const fontSizeMap: Record<number, string> = {
+          1: '30px',   // Module 레벨
+          2: '70px',   // Class 레벨
+          3: '200px',   // Method 레벨
+          4: '300px'    // Field 레벨 - 가장 작음
+        };
+        return fontSizeMap[viewLevel] || '80px';
+      })(),
+      'text-max-width': 'none',  // 텍스트 가로 너비 제한 없음
+      'text-wrap': 'none',       // 텍스트 줄바꿈 없음
       'text-background-opacity': 0.9,
       'text-background-color': '#207000',
       'text-background-padding': 2,
