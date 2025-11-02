@@ -25,7 +25,7 @@ from .models import (
 )
 from .ast_analyzer import ASTAnalyzer, FileAnalysis
 from .legacy_bridge import LegacyBridge
-# from .code_metrics import CodeMetricsEngine  # Currently disabled
+from .code_metrics import CodeMetricsEngine
 from .cache_manager import CacheManager, IncrementalAnalyzer, AnalysisCache, FileMetadata
 from .performance_optimizer import LargeProjectAnalyzer, PerformanceConfig, ResultPaginator
 from .gitignore_patterns import create_gitignore_matcher

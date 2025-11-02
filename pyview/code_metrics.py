@@ -19,6 +19,8 @@ from .models import MethodInfo, ClassInfo, ModuleInfo
 class ComplexityMetrics:
     """Code complexity metrics for a method/function"""
     cyclomatic_complexity: int = 1  # Base complexity
+    cognitive_complexity: int = 0   # Cognitive complexity (how hard to understand)
+    nesting_depth: int = 0          # Maximum nesting depth
     lines_of_code: int = 0         # Physical lines
     logical_lines: int = 0         # Logical lines of code
 
@@ -31,40 +33,61 @@ class QualityMetrics:
 
 
 class ComplexityAnalyzer(ast.NodeVisitor):
-    """AST visitor to calculate cyclomatic complexity"""
-    
+    """AST visitor to calculate cyclomatic and cognitive complexity"""
+
     def __init__(self):
-        self.complexity = 1  # Base complexity
-        
+        self.complexity = 1  # Base cyclomatic complexity
+        self.cognitive_complexity = 0  # Cognitive complexity
+        self.nesting_depth = 0  # Current nesting depth
+        self.max_nesting_depth = 0  # Maximum nesting depth
+        self.nesting_stack = []  # Track nesting levels
+
     def visit_If(self, node):
         self.complexity += 1
+        self.cognitive_complexity += 1 + self.nesting_depth
+        self.nesting_depth += 1
+        self.max_nesting_depth = max(self.max_nesting_depth, self.nesting_depth)
         self.generic_visit(node)
-        
+        self.nesting_depth -= 1
+
     def visit_For(self, node):
         self.complexity += 1
+        self.cognitive_complexity += 1 + self.nesting_depth
+        self.nesting_depth += 1
+        self.max_nesting_depth = max(self.max_nesting_depth, self.nesting_depth)
         self.generic_visit(node)
-        
+        self.nesting_depth -= 1
+
     def visit_While(self, node):
         self.complexity += 1
+        self.cognitive_complexity += 1 + self.nesting_depth
+        self.nesting_depth += 1
+        self.max_nesting_depth = max(self.max_nesting_depth, self.nesting_depth)
         self.generic_visit(node)
-        
+        self.nesting_depth -= 1
+
     def visit_Try(self, node):
         self.complexity += len(node.handlers)
+        self.cognitive_complexity += len(node.handlers)
         self.generic_visit(node)
-        
+
     def visit_With(self, node):
         self.complexity += 1
+        self.cognitive_complexity += 1
         self.generic_visit(node)
-        
+
     def visit_BoolOp(self, node):
         if isinstance(node.op, (ast.And, ast.Or)):
             self.complexity += len(node.values) - 1
+            self.cognitive_complexity += len(node.values) - 1
         self.generic_visit(node)
-        
+
     def visit_comprehension(self, node):
         self.complexity += 1
+        self.cognitive_complexity += 1
         for if_clause in node.ifs:
             self.complexity += 1
+            self.cognitive_complexity += 1
         self.generic_visit(node)
         
 
@@ -80,29 +103,31 @@ class CodeMetricsEngine:
         try:
             # Parse just the method's AST node
             tree = ast.parse(source_code)
-            
+
             # Find the method node
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef) and node.name == method.name:
                     analyzer = ComplexityAnalyzer()
                     analyzer.visit(node)
-                    
+
                     # Count lines of code
                     lines = source_code.split('\n')
                     physical_lines = len([line for line in lines if line.strip()])
-                    logical_lines = len([line for line in lines 
+                    logical_lines = len([line for line in lines
                                        if line.strip() and not line.strip().startswith('#')])
-                    
+
                     return ComplexityMetrics(
                         cyclomatic_complexity=analyzer.complexity,
+                        cognitive_complexity=analyzer.cognitive_complexity,
+                        nesting_depth=analyzer.max_nesting_depth,
                         lines_of_code=physical_lines,
                         logical_lines=logical_lines
                     )
-                    
+
         except Exception as e:
             # Return default metrics if parsing fails
             pass
-            
+
         return ComplexityMetrics()
     
     def analyze_class_quality(self, class_info: ClassInfo, module_source: str) -> QualityMetrics:

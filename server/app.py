@@ -357,7 +357,7 @@ async def run_analysis_task(analysis_id: str, request: AnalysisRequest):
                 include_stdlib=request.options.include_stdlib,  # Use user setting
                 analysis_levels=["package", "module", "class", "method"],  # Include more levels for better cycle detection
                 enable_type_inference=request.options.enable_type_inference,  # Use user setting
-                enable_quality_metrics=False,  # Disable quality metrics to prevent hanging
+                enable_quality_metrics=True,  # Enable quality metrics (now optimized)
                 enable_caching=False,  # Disable caching for now
                 max_workers=1  # Use single worker to prevent issues
             )
@@ -756,21 +756,25 @@ async def get_quality_metrics(analysis_id: str):
     actual_metrics = analysis_results.get("quality_metrics", [])
     if actual_metrics:
         # Use actual quality metrics if available
+        print(f"✅ Using {len(actual_metrics)} actual quality metrics from analysis engine")
         for metric in actual_metrics:
             entity_id = metric.get("entity_id", "unknown")
             is_in_cycle = entity_id in cycle_map
             cycle_info = cycle_map.get(entity_id, {})
-            
+
+            # Get coupling metrics from analysis results
+            coupling_metrics = analysis_results.get("metrics", {}).get("coupling_metrics", {}).get(entity_id, {})
+
             quality_metrics.append(QualityMetricsResponse(
                 entity_id=entity_id,
                 entity_type=metric.get("entity_type", "module"),
                 cyclomatic_complexity=metric.get("cyclomatic_complexity", 0),
                 lines_of_code=metric.get("lines_of_code", 0),
-                afferent_coupling=metric.get("afferent_coupling", 0),
-                efferent_coupling=metric.get("efferent_coupling", 0),
-                instability=metric.get("instability", 0.0),
+                afferent_coupling=coupling_metrics.get("afferent_coupling", 0),
+                efferent_coupling=coupling_metrics.get("efferent_coupling", 0),
+                instability=coupling_metrics.get("instability", 0.0),
                 maintainability_index=metric.get("maintainability_index", 0.0),
-                technical_debt_ratio=metric.get("technical_debt_ratio", 0.0),
+                technical_debt_ratio=0.0,  # TODO: Calculate from complexity metrics
                 quality_grade=metric.get("quality_grade", "C"),
                 is_in_cycle=is_in_cycle,
                 cycle_severity=cycle_info.get("severity"),
@@ -778,7 +782,8 @@ async def get_quality_metrics(analysis_id: str):
                 cycle_type=cycle_info.get("cycle_type")
             ))
     else:
-        # Generate basic quality metrics from modules and classes
+        # Fallback: Generate basic quality metrics from modules and classes
+        print("⚠️  WARNING: Quality metrics engine disabled or failed. Generating fallback dummy metrics.")
         dependency_graph = analysis_results.get("dependency_graph", {})
         
         # Add metrics for modules
