@@ -83,7 +83,7 @@ const QualityMetricsPage: React.FC<QualityMetricsPageProps> = ({ analysisId }) =
   const getMaintainabilityStatus = (index: number) => {
     if (index >= 80) return { status: 'success' as const, text: '우수' };
     if (index >= 60) return { status: 'active' as const, text: '양호' };
-    return { status: 'exception' as const, text: '나쁘' };
+    return { status: 'exception' as const, text: '나쁨' };
   };
 
   const getEntityTypeColor = (type: string) => {
@@ -392,7 +392,7 @@ const QualityMetricsPage: React.FC<QualityMetricsPageProps> = ({ analysisId }) =
                 valueStyle={{
                   color: avgMaintainability >= 80 ? '#3f8600' : avgMaintainability >= 60 ? '#faad14' : '#cf1322'
                 }}
-                suffix="/ 100"
+                suffix=""
               />
             </Card>
           </Col>
@@ -605,8 +605,8 @@ const QualityMetricsPage: React.FC<QualityMetricsPageProps> = ({ analysisId }) =
               <li><Text strong>A:</Text> 우수 (복잡도 ≤10, 유지보수성 ≥80)</li>
               <li><Text strong>B:</Text> 양호 (복잡도 ≤20, 유지보수성 ≥60)</li>
               <li><Text strong>C:</Text> 보통 (복잡도 ≤50, 유지보수성 ≥40)</li>
-              <li><Text strong>D:</Text> 나쁘 (높은 복잡도, 낮은 유지보수성)</li>
-              <li><Text strong>F:</Text> 매우 나쁕 (매우 높은 복잡도, 매우 낮은 유지보수성)</li>
+              <li><Text strong>D:</Text> 나쁨 (높은 복잡도, 낮은 유지보수성)</li>
+              <li><Text strong>F:</Text> 매우 나쁨 (매우 높은 복잡도, 매우 낮은 유지보수성)</li>
             </ul>
           </div>
 
@@ -615,7 +615,7 @@ const QualityMetricsPage: React.FC<QualityMetricsPageProps> = ({ analysisId }) =
           <div style={{ marginBottom: 24 }}>
             <Title level={4}>순환 복잡도</Title>
             <Text>
-              프로그램 소스 코드를 통과하는 선형 독립적인 경로의 수를 측정합니다.
+              프로그램 소스 코드를 통과하는 경로의 수를 측정합니다.
               높은 값은 테스트하고 유지보수하기 어려운 더 복잡한 코드를 나타냅니다.
             </Text>
             <ul style={{ marginTop: 8, paddingLeft: 20 }}>
@@ -631,11 +631,11 @@ const QualityMetricsPage: React.FC<QualityMetricsPageProps> = ({ analysisId }) =
           <div style={{ marginBottom: 24 }}>
             <Title level={4}>유지보수성 지수</Title>
             <Text>
-              순환 복잡도와 코드 라인 수를 사용하여 계산됩니다. 높은 값은
+              순환 복잡도와 분기문 개수, 코드 라인 수를 사용하여 계산됩니다. 높은 값은
               더 유지보수하기 쉬운 코드를 나타냅니다.
             </Text>
             <ul style={{ marginTop: 8, paddingLeft: 20 }}>
-              <li><Text strong>80-100:</Text> 우수한 유지보수성</li>
+              <li><Text strong>80-:</Text> 우수한 유지보수성</li>
               <li><Text strong>60-79:</Text> 양호한 유지보수성</li>
               <li><Text strong>40-59:</Text> 보통 유지보수성</li>
               <li><Text strong>0-39:</Text> 나쁜 유지보수성</li>

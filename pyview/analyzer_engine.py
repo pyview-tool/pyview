@@ -975,12 +975,16 @@ class AnalyzerEngine:
 
         # 모듈에 대한 메트릭 계산                                                               # 모듈 레벨 품질 분석
         for module in integrated_data.get('modules', []):                                      # 모든 모듈에 대해
-            source_code = source_cache.get(module.file_path, "")                              # 해당 모듈의 소스 코드 가져오기
+            # 기존에는 ClassInfo를 객체로만 받았으나, 딕셔너리로 만들어 넘겨주는 레거시 코드가 있어 호환성을 위해 추가
+            file_path = module.file_path if hasattr(module, 'file_path') else module.get('file_path', '')
+            entity_id = module.id if hasattr(module, 'id') else module.get('id', 'unknown')
+
+            source_code = source_cache.get(file_path, "")                                     # 해당 모듈의 소스 코드 가져오기
             if source_code:                                                                     # 소스 코드가 있으면
                 module_metrics = self.metrics_engine.analyze_module_quality(module, source_code)  # 모듈 품질 분석 수행
 
                 quality_metric = QualityMetrics(                                               # 품질 메트릭 객체 생성
-                    entity_id=module.id,                                                       # 모듈 ID
+                    entity_id=entity_id,                                                       # 모듈 ID
                     entity_type=EntityType.MODULE,                                            # 엔티티 타입 (모듈)
                     cyclomatic_complexity=module_metrics.complexity.cyclomatic_complexity,    # 순환 복잡도
                     cognitive_complexity=module_metrics.complexity.cognitive_complexity,      # 인지 복잡도
@@ -997,12 +1001,16 @@ class AnalyzerEngine:
                 progress_callback.update(f"Quality metrics: {processed}/{total_entities}", progress)  # 진행률 업데이트
         # 클래스에 대한 메트릭 계산                                                             # 클래스 레벨 품질 분석
         for class_info in integrated_data.get('classes', []):                                  # 모든 클래스에 대해
-            source_code = source_cache.get(class_info.file_path, "")                          # 해당 클래스의 소스 코드 가져오기
+            # 기존에는 ClassInfo를 객체로만 받았으나, 딕셔너리로 만들어 넘겨주는 레거시 코드가 있어 호환성을 위해 추가
+            file_path = class_info.file_path if hasattr(class_info, 'file_path') else class_info.get('file_path', '')
+            entity_id = class_info.id if hasattr(class_info, 'id') else class_info.get('id', 'unknown')
+
+            source_code = source_cache.get(file_path, "")                                     # 해당 클래스의 소스 코드 가져오기
             if source_code:                                                                     # 소스 코드가 있으면
                 class_metrics = self.metrics_engine.analyze_class_quality(class_info, source_code)  # 클래스 품질 분석 수행
 
                 quality_metric = QualityMetrics(                                               # 품질 메트릭 객체 생성
-                    entity_id=class_info.id,                                                   # 클래스 ID
+                    entity_id=entity_id,                                                       # 클래스 ID
                     entity_type=EntityType.CLASS,                                             # 엔티티 타입 (클래스)
                     cyclomatic_complexity=class_metrics.complexity.cyclomatic_complexity,     # 순환 복잡도
                     cognitive_complexity=class_metrics.complexity.cognitive_complexity,       # 인지 복잡도
