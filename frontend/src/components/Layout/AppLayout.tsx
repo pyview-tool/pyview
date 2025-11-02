@@ -60,10 +60,23 @@ const AppLayout: React.FC<AppLayoutProps> = ({
     onMenuSelect?.(key)
   }
 
+  const handleLogoClick = () => {
+    // 홈(프로젝트 분석 페이지)으로 이동
+    onMenuSelect?.('analysis')
+  }
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header style={{ display: 'flex', alignItems: 'center' }}>
-        <div style={{ color: 'white', marginRight: 24 }}>
+        <div 
+          style={{ 
+            color: 'white', 
+            marginRight: 24,
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
+          onClick={handleLogoClick}
+        >
           <Title level={3} style={{ color: 'white', margin: 0 }}>
             PyView
           </Title>

@@ -6,8 +6,8 @@ import {
   Button,
   Card,
   Space,
-  InputNumber,
-  Switch,
+  // InputNumber,  // 주석 처리된 코드에서만 사용됨
+  // Switch,       // 주석 처리된 코드에서만 사용됨
   Tag,
   Typography,
   message

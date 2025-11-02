@@ -232,7 +232,7 @@ const convertFileSystemToTreeNodes = (fsNode: FileSystemNode, cycleInfo: any): F
     return nameA.localeCompare(nameB) // 알파벳순
   })
 
-  sortedChildren.forEach(([name, childNode]) => {
+  sortedChildren.forEach(([_name, childNode]) => {
     const isInCycle = childNode.isInCycle || false
 
     if (childNode.isFolder) {

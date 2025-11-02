@@ -19,7 +19,7 @@ import type { SearchRequest, SearchResponse, SearchResult } from '@/types/api'
 
 const { Search } = Input
 const { Option } = Select
-const { Text, Link } = Typography
+const { Text } = Typography  // Link는 현재 미사용
 
 interface SearchPageProps {
   analysisId: string | null
@@ -53,7 +53,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ analysisId }) => {
       const request: SearchRequest = {
         query: query.trim(),
         entity_type: entityType === 'all' ? undefined : entityType,
-        analysis_id: analysisId
+        analysis_id: analysisId || undefined  // null을 undefined로 변환
       }
       
       const response: SearchResponse = await ApiService.searchEntities(request)

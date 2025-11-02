@@ -4,7 +4,7 @@ import { Card, Progress, Typography, Space, Tag } from 'antd'
 import { LoadingOutlined, CheckCircleOutlined, ExclamationCircleOutlined, ClockCircleOutlined } from '@ant-design/icons'
 import type { AnalysisStatusResponse } from '@/types/api'
 
-const { Title, Text, Paragraph } = Typography
+const { Text } = Typography  // Title, Paragraph는 현재 미사용
 
 interface ProgressDisplayProps {
   analysis?: AnalysisStatusResponse | null

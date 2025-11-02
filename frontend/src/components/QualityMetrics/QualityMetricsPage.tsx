@@ -468,7 +468,7 @@ const QualityMetricsPage: React.FC<QualityMetricsPageProps> = ({ analysisId }) =
                 setPageSize(size);
               }
             },
-            onShowSizeChange: (current, size) => {
+            onShowSizeChange: (_current, size) => {
               setPageSize(size);
               setCurrentPage(1);
             },
