@@ -52,7 +52,7 @@ export const getHierarchicalStylesheet = (viewLevel: number = 1): any[] => [
       'text-outline-width': 1,
       'text-outline-color': '#fff',
       'border-width': 2,
-      'border-color': '#666',
+      'border-color': 'rgba(0, 0, 0, 1)',
       'text-wrap': 'wrap',
       'text-max-width': '150px',
       'shape': (node: any) => {
@@ -128,9 +128,9 @@ export const getHierarchicalStylesheet = (viewLevel: number = 1): any[] => [
     style: {
       'padding': '5%',
       'shape': 'round-rectangle',
-      'background-color': '#B0FFB0',
+      'background-color': 'rgba(255, 255, 255, 1)',
       'background-opacity': 0.05,
-      'border-width': 3,
+      'border-width': 10,
       'border-color': '#8c8c8c',
       'label': '',
       'font-size': '25px',
@@ -186,10 +186,10 @@ export const getHierarchicalStylesheet = (viewLevel: number = 1): any[] => [
     style: {
       'padding': '5%',
       'shape': 'round-rectangle',
-      'background-color': '#00FF55',
+      'background-color': 'rgba(113, 243, 37, 1)',
       'background-opacity': 0.08,
-      'border-width': 2,
-      'border-color': '#52c41a',
+      'border-width': 4,
+      'border-color': '#48b413',
       'label': '',
       'text-opacity': 0,
       'z-index': 1,
@@ -204,10 +204,10 @@ export const getHierarchicalStylesheet = (viewLevel: number = 1): any[] => [
     style: {
       'padding': '10%',
       'shape': 'round-rectangle',
-      'background-color': '#E5FF00',
-      'background-opacity': 0.05,
-      'border-width': 2,
-      'border-color': '#d4b106',
+      'background-color': 'rgba(255, 255, 217, 1)',
+      'background-opacity': 0.6,
+      'border-width': 5,
+      'border-color': '#fa8c16',
       'label': '',
       'text-opacity': 0,
       'z-index': 2,
@@ -228,7 +228,6 @@ export const getHierarchicalStylesheet = (viewLevel: number = 1): any[] => [
   {
     selector: 'node:parent',
     style: {
-      'background-opacity': 0.1,
       'text-outline-width': 0
     }
   },
@@ -247,7 +246,7 @@ export const getHierarchicalStylesheet = (viewLevel: number = 1): any[] => [
   {
     selector: 'node.connected',
     style: {
-      'border-color': '#FF5100',
+      'border-color': '#1E90FF',
       'border-width': 4,
       'opacity': 1
     }
