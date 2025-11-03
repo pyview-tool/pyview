@@ -426,18 +426,9 @@ const FileTreeSidebar: React.FC<FileTreeSidebarProps> = ({
   // Auto expand matching nodes when searching
   useEffect(() => {
     if (searchValue) {
-      const getAllKeys = (nodes: FileTreeNode[]): React.Key[] => {
-        let keys: React.Key[] = []
-        nodes.forEach(node => {
-          keys.push(node.key)
-          if (node.children) {
-            keys = keys.concat(getAllKeys(node.children))
-          }
-        })
-        return keys
-      }
-      setExpandedKeys(getAllKeys(filteredTreeData))
-      setAutoExpandParent(true)
+      // 검색 중에는 기본적으로 접힌 상태 유지
+      setExpandedKeys([])
+      setAutoExpandParent(false)
     } else {
       // Auto-expand first level when not searching
       const firstLevelKeys = treeData.map(node => node.key)
