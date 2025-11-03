@@ -13,7 +13,7 @@
   
   **프로젝트 기간** : 2025.06.30 ~
 
-  [🎥 Demo Video](https://youtu.be/gdDv0QxzrF8)
+  [🎥 시연 영상](https://youtu.be/kUB_d-ddK18)
 </div>
 
 <br/>
