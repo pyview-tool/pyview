@@ -7,8 +7,7 @@
 ![React](https://img.shields.io/badge/React-18.2.0-61DAFB.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.104%2B-009688.svg)
 
-<img width="931" height="522" alt="image" src="https://github.com/user-attachments/assets/ee71b6ac-671b-4b52-8c27-89048f0119d5" />
-
+<img width="931" height="500" alt="image" src="https://github.com/user-attachments/assets/5ab72c72-b5a7-4c27-b35c-2ffabf441121" />
 
   🏆 **2025 오픈소스 개발자대회 출품작**
   
@@ -21,61 +20,86 @@
 
 ## ✨ PyView 프로젝트 소개
 
-### More Than Visualization, Interactive Code Understanding
+### Interactive Python Dependency Visualization
+- **PyView**는 Python 프로젝트의 의존성을 **실시간으로 시각화·탐색**할 수 있는 **웹 기반 도구**입니다.  
+- **5단계 분석(패키지→모듈→클래스→메서드→필드)** 을 통해 코드 구조를 세밀하게 파악할 수 있습니다.  
+- **검색·필터·하이라이트** 기능으로 의존 경로를 직관적으로 탐색합니다.  
+- **복잡도·유지보수성·결합도** 등 주요 **품질 지표**를 함께 제공합니다.  
+- **스트리밍·캐시 기반 분석**으로 **대규모 코드베이스도 빠르고 안정적으로 처리**합니다.
+<br/>
 
-- PyView는 Python 프로젝트의 복잡한 의존성을 **실시간 상호작용형 웹 인터페이스**로 시각화하는 차세대 개발자 도구입니다.
-- **5계층 분석** (Package → Module → Class → Method → Field)을 통한 심층적 코드 구조 탐색
-- 기존 pydeps의 정적 이미지 생성을 넘어 **고성능 시각화**와 **실시간 검색** 제공
-- **대규모 코드베이스** 리팩토링, 아키텍처 분석, 의존성 관리를 위한 도구
+PyView는 기존 오픈소스 도구인 [`pydeps`](https://github.com/thebjorn/pydeps) 를 기반으로 개발되었습니다. 
 
 <br/>
+
 
 ## 🏗️ 시스템 아키텍처
 
 <div align="center">
-<img width="2881" height="1392" alt="image" src="https://github.com/user-attachments/assets/cecee27a-9728-430a-b0d5-e9431c39a43f" />
-
+    <img width="8041" height="2460" alt="image" src="https://github.com/user-attachments/assets/b49ad252-ffff-463a-b12b-3e983608e059" />
 </div>
 
 <br/>
 
 ## 🖥️ 주요 기능 소개
+<table align="center" width="100%">
+  <tr>
+    <th width="50%">프로젝트 분석 설정</th>
+    <th width="50%">5계층(패키지 → 모듈 → 클래스 → 메서드 → 필드)시각화</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/72735fd1-eb68-43b5-96dc-2ce6a5c7fe68" width="380px" alt="프로젝트 분석 설정">
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/cfe781a0-b4ed-4dd7-83ef-71b324c86b3d" width="380px" alt="5계층 그래프 시각화">
+    </td>
+  </tr>
 
-### 📊 프로젝트 분석 및 시각화
+  <tr>
+    <th>노드 검색 및 하이라이트</th>
+    <th>Interactive 인터페이스</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/7f960fb6-5f39-4828-addc-f2ab2c0868cb" width="380px" alt="노드 검색 및 하이라이트">
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/2ed2ca5d-5f43-453a-abaf-ef9a7ca40e4e" width="380px" alt="Interactive 인터페이스">
+    </td>
+  </tr>
 
-<div align="center">
+  <tr>
+    <th>순환 참조 엣지 하이라이트</th>
+    <th>노드 탐색기 내 순환 참조 표시</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/458eb7af-ed1d-4445-9b34-ba99fd7e71c5" width="280px" alt="순환참조 엣지 하이라이트">
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/ccede3dc-00b1-4546-81a3-37e3dc18a674" width="280px" alt="노드탐색기 순환참조 표시">
+    </td>
+  </tr>
 
-| **프로젝트 분석 설정** | **실시간 분석 진행률** |
-|:---:|:---:|
-| <img width="3360" height="1824" alt="image" src="https://github.com/user-attachments/assets/0d5e8da6-6e7e-4658-9e59-c3e11163d52e" /> | <img width="1744" height="516" alt="image" src="https://github.com/user-attachments/assets/3243adef-c4b0-4aca-afdc-a7aae8ebb74d" />|
+  <tr>
+    <th>프로젝트 코드 품질 분석 대시보드</th>
+    <th>순환 참조 상세정보</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/6851f0bf-730c-4022-affc-123282f6cdd8" width="380px" alt="코드 품질 분석 대시보드">
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/94acaf6e-a011-4feb-96f6-02de3a808d3d" width="380px" alt="순환참조 상세정보">
+    </td>
+  </tr>
+</table>
+
+
 
 </div>
 
-### 🔍 5계층 상세 분석
-
-<div align="center">
-
-| **모듈 레벨 시각화** | **클래스 레벨 시각화** |
-|:---:|:---:|
-| <img width="703" height="599" alt="image" src="https://github.com/user-attachments/assets/3123f440-7139-449d-ad77-9ded4bb72163" /> | <img width="651" height="477" alt="image" src="https://github.com/user-attachments/assets/cb1a7b30-d72e-425a-8ac4-06a5c9410f1d" /> |
-
-| **메서드 레벨 시각화** | **필드 레벨 시각화** |
-|:---:|:---:|
-| <img width="816" height="624" alt="image" src="https://github.com/user-attachments/assets/e196948e-deb7-4e93-91ea-af9d22eb880c" /> | <img width="1140" height="597" alt="image" src="https://github.com/user-attachments/assets/6e6598d0-d6f2-4a52-aab5-0402f98b86b5" /> |
-
-</div>
-
-### 🎯 핵심 기능
-
-<div align="center">
-
-| **의존성 경로 하이라이트** | **노드 탐색기에서 노드 선택** |
-|:---:|:---:|
-| <img width="522" height="544" alt="image" src="https://github.com/user-attachments/assets/5b9efda8-d790-423e-90f9-c42fd6546fc1" /> | <img width="620" height="439" alt="image" src="https://github.com/user-attachments/assets/35435051-dfbd-4abb-925c-dd47016cd294" /> |
-
-| **통합 검색 시스템** | **코드 품질 메트릭** |
-|:---:|:---:|
-| <img width="1637" height="687" alt="image" src="https://github.com/user-attachments/assets/95fae1fd-1450-4f77-af60-c2871da3cd5d" /> | <img width="1675" height="776" alt="image" src="https://github.com/user-attachments/assets/6b1fa522-7b1e-4ec6-bb86-00320ca44b48" /> |
 
 </div>
 
@@ -103,7 +127,7 @@
 <br/>
 <br/>
 
-## 🚀 실행 방법법
+## 🚀 실행 방법
 
 ### 📋 시스템 요구사항
 
