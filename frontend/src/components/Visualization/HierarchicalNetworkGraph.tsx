@@ -73,6 +73,10 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
   const cyRef = useRef<HTMLDivElement>(null);
   const cyInstanceRef = useRef<cytoscape.Core | null>(null);
   const internalSelectionRef = useRef<boolean>(false);
+  // 초기화 시 뷰포트(zoom/pan) 보존용
+  const suppressViewportRef = useRef<boolean>(false);
+  const prevZoomRef = useRef<number | null>(null);
+  const prevPanRef = useRef<{ x: number; y: number } | null>(null);
   
   // 상태 관리
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
@@ -309,9 +313,23 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
         // 모듈 수 집계 후 스케일링된 레이아웃 실행 (viewLevel 포함)
         const moduleCount = cy.nodes('[type = "module"]').length;
         cy.layout(getHierarchicalLayout(moduleCount, viewLevel)).run();
-        // 레이아웃 직후 바로 화면 맞춤 및 콜백 호출 (불필요한 2차 렌더링 감축)
-        cy.fit();
-        cy.zoom(cy.zoom() * 0.8);
+        // 뷰포트 보존 모드면 fit/zoom 생략하고 이전 뷰포트 복원
+        if (suppressViewportRef.current) {
+          if (prevZoomRef.current !== null) {
+            cy.zoom(prevZoomRef.current);
+          }
+          if (prevPanRef.current !== null) {
+            cy.pan(prevPanRef.current);
+          }
+          // 한 번 적용 후 플래그/저장값 초기화
+          suppressViewportRef.current = false;
+          prevZoomRef.current = null;
+          prevPanRef.current = null;
+        } else {
+          // 레이아웃 직후 바로 화면 맞춤 및 콜백 호출 (불필요한 2차 렌더링 감축)
+          cy.fit();
+          cy.zoom(cy.zoom() * 0.8);
+        }
         onGraphReady?.();
       });
 
@@ -1040,6 +1058,13 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
 
   // 전체 확장/축소
   const expandAll = () => {
+    // 현재 뷰포트 저장 및 복원 모드 활성화
+    if (cyInstanceRef.current) {
+      prevZoomRef.current = cyInstanceRef.current.zoom();
+      const pan = cyInstanceRef.current.pan();
+      prevPanRef.current = { x: pan.x, y: pan.y };
+      suppressViewportRef.current = true;
+    }
     const allExpandableNodes = hierarchicalData.nodes
       .filter(n => n.children && n.children.length > 0)
       .map(n => n.id);
