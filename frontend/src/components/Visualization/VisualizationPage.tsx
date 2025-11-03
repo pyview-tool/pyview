@@ -70,7 +70,7 @@ const VisualizationPage: React.FC<VisualizationPageProps> = ({ analysisId }) => 
 
         if (!isMounted || abortController.signal.aborted) return;
 
-        // Store raw analysis results for file tree
+        // Store raw analysis results for node explorer
         setAnalysisResults(results)
         
         // ② GET 요청 대기 오버레이 OFF
@@ -156,13 +156,13 @@ const VisualizationPage: React.FC<VisualizationPageProps> = ({ analysisId }) => 
 
   // Unified node selection handler
   const handleNodeSelection = (nodeId: string, source: 'file-tree' | 'graph', nodeType?: string) => {
-    console.log(`${source === 'file-tree' ? '🌳 File tree' : '🎯 Graph'} selected:`, nodeId, nodeType || '')
+    console.log(`${source === 'file-tree' ? '🌳 노드 탐색기' : '🎯 Graph'} selected:`, nodeId, nodeType || '')
     setSelectedNodeId(nodeId)
 
     // Try to get info from graph data first, then fallback to nodeType if provided
     const { type, name } = getNodeInfo(nodeId)
 
-    // If getNodeInfo couldn't find it and we have nodeType from file tree, use that
+    // If getNodeInfo couldn't find it and we have nodeType from node explorer, use that
     if (type === 'Node' && nodeType && source === 'file-tree') {
       const parsedName = nodeId.includes('/') ? nodeId.split('/').pop() || nodeId : nodeId
       const parsedType = nodeType.charAt(0).toUpperCase() + nodeType.slice(1)
@@ -174,7 +174,7 @@ const VisualizationPage: React.FC<VisualizationPageProps> = ({ analysisId }) => 
     }
   }
 
-  // File tree node selection handler (wrapper)
+  // Node explorer node selection handler (wrapper)
   const handleFileTreeNodeSelect = (nodeId: string, nodeType: string) => {
     handleNodeSelection(nodeId, 'file-tree', nodeType)
   }
@@ -211,7 +211,7 @@ const VisualizationPage: React.FC<VisualizationPageProps> = ({ analysisId }) => 
   return (
     <div style={{ position: 'relative', minHeight: '100%' }}>
       <Row gutter={[16, 16]}>
-        {/* File Tree Column - 항상 렌더링하되, 데이터가 없으면 빈 상태 */}
+        {/* Node Explorer Column - 항상 렌더링하되, 데이터가 없으면 빈 상태 */}
         <Col xs={24} sm={6} md={6} lg={5}>
           {analysisResults ? (
             <FileTreeSidebar

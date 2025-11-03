@@ -1,4 +1,4 @@
-// File Tree Sidebar Component for IDE-like file navigation  
+// Node Explorer Sidebar Component for IDE-like node navigation  
 import React, { useState, useEffect, useMemo } from 'react'
 import { Tree, Input, Card, Empty } from 'antd'
 import {
@@ -552,14 +552,14 @@ const FileTreeSidebar: React.FC<FileTreeSidebarProps> = ({
   return (
     <div style={{ height: '100%', ...style }}>
       <Card 
-        title="파일 탐색기" 
+        title="노드 탐색기" 
         size="small" 
         style={{ height: '100%' }}
         bodyStyle={{ padding: 0, height: 'calc(100% - 57px)' }}
       >
         <div style={{ padding: '8px' }}>
           <Search
-            placeholder="파일 검색..."
+            placeholder="노드 검색..."
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             prefix={<SearchOutlined />}

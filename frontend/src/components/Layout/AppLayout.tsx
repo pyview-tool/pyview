@@ -99,7 +99,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           />
         </Sider>
         
-        {/* File Tree Sider - 조건부 렌더링 */}
+        {/* Node Explorer Sider - 조건부 렌더링 */}
         {showFileTree && (
           <Sider 
             width={fileTreeWidth} 

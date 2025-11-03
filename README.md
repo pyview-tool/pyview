@@ -69,7 +69,7 @@
 
 <div align="center">
 
-| **의존성 경로 하이라이트** | **파일 탐색기에서 노드 선택** |
+| **의존성 경로 하이라이트** | **노드 탐색기에서 노드 선택** |
 |:---:|:---:|
 | <img width="522" height="544" alt="image" src="https://github.com/user-attachments/assets/5b9efda8-d790-423e-90f9-c42fd6546fc1" /> | <img width="620" height="439" alt="image" src="https://github.com/user-attachments/assets/35435051-dfbd-4abb-925c-dd47016cd294" /> |
 

@@ -330,7 +330,7 @@ const HierarchicalNetworkGraph: React.FC<HierarchicalGraphProps> = ({
     };
   }, [hierarchicalData, viewLevel, expandedNodes]);
 
-  // Handle external node selection (from file tree)
+  // Handle external node selection (from node explorer)
   useEffect(() => {
     if (!selectedNodeId) {
       setSelectedNode(null);
