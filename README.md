@@ -169,6 +169,9 @@ http://localhost:3000
 > cd frontend && npm install && npm run dev
 > ```
 
+</br>
+</br>
+
 ## 🪟 Windows 사용자 주의사항
 
 ### 필수 설치 및 설정
