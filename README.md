@@ -7,7 +7,8 @@
 ![React](https://img.shields.io/badge/React-18.2.0-61DAFB.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.104%2B-009688.svg)
 
-<img width="931" height="500" alt="image" src="https://github.com/user-attachments/assets/5ab72c72-b5a7-4c27-b35c-2ffabf441121" />
+<img width="1367" height="729" alt="image" src="https://github.com/user-attachments/assets/786ba7b8-1c59-4128-9057-7d8163338722" />
+
 
   🏆 **2025 오픈소스 개발자대회 출품작**
   
@@ -36,7 +37,7 @@ PyView는 기존 오픈소스 도구인 [`pydeps`](https://github.com/thebjorn/p
 ## 🏗️ 시스템 아키텍처
 
 <div align="center">
-    <img width="8041" height="2460" alt="image" src="https://github.com/user-attachments/assets/b49ad252-ffff-463a-b12b-3e983608e059" />
+    <img width="8041" height="2460" alt="image" src="https://github.com/user-attachments/assets/21e2014b-10da-412e-9797-b270699cc2de" />
 </div>
 
 <br/>
@@ -49,11 +50,12 @@ PyView는 기존 오픈소스 도구인 [`pydeps`](https://github.com/thebjorn/p
   </tr>
   <tr>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/72735fd1-eb68-43b5-96dc-2ce6a5c7fe68" width="380px" alt="프로젝트 분석 설정">
+      <img src="https://github.com/user-attachments/assets/dc7fb877-5c36-43dd-92e7-b003b15d5ec8" width="380px" alt="프로젝트 분석 설정">
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/cfe781a0-b4ed-4dd7-83ef-71b324c86b3d" width="380px" alt="5계층 그래프 시각화">
+      <img src="https://github.com/user-attachments/assets/ce6c9957-7a0b-4335-83bf-255222da78be" width="380px" alt="5계층 그래프 시각화">
     </td>
+
   </tr>
 
   <tr>
@@ -62,10 +64,10 @@ PyView는 기존 오픈소스 도구인 [`pydeps`](https://github.com/thebjorn/p
   </tr>
   <tr>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/7f960fb6-5f39-4828-addc-f2ab2c0868cb" width="380px" alt="노드 검색 및 하이라이트">
+      <img src="https://github.com/user-attachments/assets/2ea92706-b869-4103-904b-a34d1cfa9577" width="380px" alt="노드 검색 및 하이라이트">
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/2ed2ca5d-5f43-453a-abaf-ef9a7ca40e4e" width="380px" alt="Interactive 인터페이스">
+      <img src="https://github.com/user-attachments/assets/17cde056-2464-4212-8cbe-e2dfef8f08eb" width="380px" alt="Interactive 인터페이스">
     </td>
   </tr>
 
@@ -75,10 +77,10 @@ PyView는 기존 오픈소스 도구인 [`pydeps`](https://github.com/thebjorn/p
   </tr>
   <tr>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/458eb7af-ed1d-4445-9b34-ba99fd7e71c5" width="280px" alt="순환참조 엣지 하이라이트">
+      <img width="417" alt="순환참조" src="https://github.com/user-attachments/assets/1a8396d5-4493-4ccb-b47b-095d6ceb401d" />
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/ccede3dc-00b1-4546-81a3-37e3dc18a674" width="280px" alt="노드탐색기 순환참조 표시">
+        <img width="257" alt="노드탐색기_순환참조" src="https://github.com/user-attachments/assets/2994f894-ce96-492f-84b5-06fa410f24f0" />
     </td>
   </tr>
 
@@ -88,11 +90,12 @@ PyView는 기존 오픈소스 도구인 [`pydeps`](https://github.com/thebjorn/p
   </tr>
   <tr>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/6851f0bf-730c-4022-affc-123282f6cdd8" width="380px" alt="코드 품질 분석 대시보드">
+      <img width="1463" alt="qualityMetric" src="https://github.com/user-attachments/assets/e8c85829-42f6-4513-9ca5-9de4269e515b" />
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/94acaf6e-a011-4feb-96f6-02de3a808d3d" width="380px" alt="순환참조 상세정보">
+        <img width="472" alt="순환참조 안내" src="https://github.com/user-attachments/assets/2189f3eb-7d70-46de-b301-e48a21b85578" />
     </td>
+
   </tr>
 </table>
 
