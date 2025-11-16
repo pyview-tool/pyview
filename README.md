@@ -10,9 +10,10 @@
 <img width="1367" height="729" alt="image" src="https://github.com/user-attachments/assets/786ba7b8-1c59-4128-9057-7d8163338722" />
 
 
-  🏆 **2025 오픈소스 개발자대회 출품작**
+  🏆 **2025 셈틀제 출품작**
   
   **프로젝트 기간** : 2025.06.30 ~
+
 
   [🎥 시연 영상](https://youtu.be/kUB_d-ddK18)
 </div>
@@ -237,7 +238,7 @@ pip install fastapi uvicorn
 
 <div align="center">
 
-🏆 **2025 오픈소스 개발자대회 출품작**
+🏆 **2025 셈틀제 출품작**
 
 **PyView** - *Interactive Python Dependency Visualization*
 
